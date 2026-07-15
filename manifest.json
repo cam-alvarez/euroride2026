@@ -1,0 +1,14 @@
+{
+  "name": "Euroride 2026 — Muñecos Travel Agency",
+  "short_name": "Euroride 2026",
+  "description": "11-day Harley-Davidson ride through Italy, Switzerland, Austria, Germany & France.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f3ec",
+  "theme_color": "#dd4c10",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
