@@ -236,6 +236,14 @@ async function handlePutData(request, session, env, cors, key) {
   return json({ ok: true }, 200, cors);
 }
 
+async function handleDeleteData(session, env, cors, key) {
+  if (!key || key.length > 64 || !/^[\w.-]+$/.test(key)) return json({ error: 'bad_request' }, 400, cors);
+  await env.DB.prepare(
+    'DELETE FROM user_data WHERE username = ? AND key = ?'
+  ).bind(session.username, key).run();
+  return json({ ok: true }, 200, cors);
+}
+
 async function handleDeleteAccount(request, session, env, cors) {
   const body = await readBody(request, 4096);
   if (!body) return json({ error: 'bad_request' }, 400, cors);
@@ -351,6 +359,9 @@ export default {
       if (path === '/api/data' && request.method === 'GET') return await handleGetData(session, env, cors);
       if (path.startsWith('/api/data/') && request.method === 'PUT') {
         return await handlePutData(request, session, env, cors, decodeURIComponent(path.slice('/api/data/'.length)));
+      }
+      if (path.startsWith('/api/data/') && request.method === 'DELETE') {
+        return await handleDeleteData(session, env, cors, decodeURIComponent(path.slice('/api/data/'.length)));
       }
       if (path === '/api/account' && request.method === 'DELETE') return await handleDeleteAccount(request, session, env, cors);
       if (path === '/api/chat' && request.method === 'POST') return await handleChat(request, session, env, cors);

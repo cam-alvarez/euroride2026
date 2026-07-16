@@ -625,6 +625,40 @@ main#view:focus { outline: none; }
   border-bottom-left-radius: 5px;
 }
 
+/* conversation switcher bar + list */
+.chat-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.chat-bar-btn {
+  display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
+  font: inherit; font-size: 13px; font-weight: 650; color: var(--muted);
+  background: var(--surface-2); border: none; border-radius: 99px;
+  padding: 7px 13px; cursor: pointer; text-decoration: none;
+}
+.chat-bar-btn:hover:not(:disabled) { color: var(--accent); }
+.chat-bar-btn:disabled { opacity: .45; cursor: default; }
+.chat-bar-btn svg { width: 15px; height: 15px; }
+.chat-bar-title {
+  flex: 1; min-width: 0; text-align: center; font-size: 14px; font-weight: 700;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.conv-row { display: flex; align-items: center; gap: 4px; padding: 6px 10px 6px 16px; margin-bottom: 10px; }
+.conv-open {
+  flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; align-items: flex-start;
+  font: inherit; text-align: left; background: none; border: none; padding: 10px 0; cursor: pointer;
+}
+.conv-title {
+  max-width: 100%; font-size: 14.5px; font-weight: 650; color: var(--ink);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.conv-sub { font-size: 12.5px; color: var(--muted); }
+.conv-act {
+  flex: none; display: grid; place-items: center; width: 38px; height: 38px;
+  font-size: 15px; color: var(--muted); background: none; border: none;
+  border-radius: 10px; cursor: pointer;
+}
+.conv-act:hover { background: var(--surface-2); color: var(--ink); }
+.conv-act.conv-del:hover { color: var(--danger); }
+.conv-act svg { width: 17px; height: 17px; }
+
 /* assistant replies are rendered Markdown, not preformatted text */
 .chat-md { white-space: normal; }
 .chat-md p { margin: 0 0 8px; }
