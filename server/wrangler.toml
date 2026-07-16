@@ -1,0 +1,22 @@
+# Euroride 2026 crew server — Cloudflare Worker config
+# Deploy guide: ../docs/DEPLOY-SERVER.md
+name = "euroride-api"
+main = "src/index.js"
+compatibility_date = "2026-07-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "euroride"
+# Replace with the ID printed by:  npx wrangler d1 create euroride
+database_id = "REPLACE_WITH_YOUR_DATABASE_ID"
+
+[vars]
+# Comma-separated list of origins allowed to call this API.
+# Add your GitHub Pages origin, e.g. "https://<user>.github.io"
+ALLOWED_ORIGINS = "http://localhost:8080"
+CHAT_MODEL = "claude-haiku-4-5"  # cheapest option; "claude-opus-4-8" for the best answers
+CHAT_DAILY_LIMIT = "40"          # questions per rider per day
+
+# Secrets (never in this file — this repo is public):
+#   npx wrangler secret put ANTHROPIC_API_KEY   (your console.anthropic.com key)
+#   npx wrangler secret put INVITE_CODE         (the code new riders must type to register)

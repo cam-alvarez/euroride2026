@@ -1,27 +1,84 @@
-# Euroride 2026 — Trip Site (v2)
+# Euroride 2026 — Trip App (v3 redesign)
 
-11-day Harley-Davidson itinerary: Italy → Switzerland → Austria → Germany → France.
-Bilingual (EN/ES) · light/dark · offline PWA · date-aware "today" view.
+The living itinerary + rider toolkit for an 11-day Harley-Davidson trip:
+Milan → Splügen → Stelvio → Dolomites → Munich → Alsace → Grimsel → Lake Como → Milan.
 
-## What's in v2
-- New design system: Anton + Barlow type, tappable SVG route map, per-day elevation strips.
-- Day navigation rebuilt as a native scroll-snap pager (fixes v1 scroll bugs at the root).
-- Auto-opens the current trip day between Aug 20-30, 2026; supports #day-N deep links.
+Bilingual (EN/ES) · light/dark · offline PWA · rider profiles (username + password, no email)
+· personal emergency card · packing checklist · plans/wishlist.
 
-## Files
-- index.html — the whole app. Trip content lives in `<script id="trip-data">` (`const TRIP`).
-- sw.js — offline. Page loads network-first, so published edits appear immediately.
-- manifest.json + icons — Add to Home Screen support.
+## What's in v3
 
-## Editing
-GitHub → index.html → pencil icon → edit inside the TRIP block → Commit. Live in ~1 min.
-Keep every en:/es: pair in sync. Set lodging.url to null for "find lodging nearby".
+Complete design + architecture rework of the v2 single-file site:
 
-## QA checklist (run before every release)
-Automated: HTML parse · JS syntax · EN/ES parity · jsdom smoke suite (pager math,
-chip targeting, i18n swap, modals, lodging states).
-Manual on a phone: swipe all 11 days · tap 3 random chips · tap 2 map stops ·
-toggle ES and dark · open+close a video · airplane-mode reload (after first visit).
+- **App-like navigation** — bottom tab bar on phones, top nav on desktop.
+  Six screens: **Home** (greeting, countdown/today brief, quick actions, essentials),
+  **Days** (timeline → full day brief), **SOS** (emergency, reworked),
+  **Chat** (trip assistant), **Kit** (packing + plans), **You** (profile & settings).
+- **Rider profiles** — username + password only (hashed with PBKDF2/WebCrypto).
+  Personal data stays on the device; see `docs/ACCOUNTS-AND-SYNC.md` for the
+  cross-device sync upgrade path.
+- **Emergency, rethought** — one-tap 112 call, a personal Emergency Card
+  (blood type, allergies, meds, insurance, contacts) you can show full-screen,
+  send via any app, or copy as text — plus per-country numbers, a crash
+  protocol, rental info and required documents. All offline.
+- **Modular codebase** — plain ES modules, no build step, no framework,
+  still free to host anywhere static.
+- **Real accounts + chat assistant (optional, free)** — deploy the bundled
+  crew server (`server/`, Cloudflare Worker + D1) and flip one line in
+  `js/config.js`: sign-in then works across devices, personal data syncs,
+  and the Chat tab answers trip questions with Claude using the itinerary
+  as its knowledge. Guide: `docs/DEPLOY-SERVER.md`.
+
+## Project layout
+
+```
+index.html            app shell
+css/app.css           design system (all styles)
+js/config.js          ★ API_BASE — set after deploying the crew server
+js/app.js             boot + hash router + theme
+js/i18n.js            EN/ES UI strings
+js/store.js           localStorage layer (+ sync write hook)
+js/api.js, js/sync.js crew-server client + offline-first sync queue
+js/auth.js            profiles: device-local OR server accounts (config.js)
+js/ui.js              icons, modals, toast, sparklines
+js/data/trip.js       ★ THE ITINERARY — edit this to change trip content
+js/data/emergency.js  emergency numbers, crash protocol, rental, documents
+js/data/packing.js    packing template + plan suggestions
+js/views/*.js         one module per screen (incl. chat.js)
+sw.js                 offline service worker (network-first pages)
+server/               crew server: Cloudflare Worker + D1 (accounts, sync, chat)
+tools/gen-context.mjs regenerates the assistant's trip knowledge from trip.js
+docs/                 hosting, deploy guide, roadmap, intake form
+```
+
+## Editing the trip (for Dad 👋)
+
+Everything riders read lives in `js/data/trip.js`. On GitHub: open the file →
+pencil icon → edit → Commit. Live in ~1 minute. Rules:
+
+- Every text appears twice: `{ en: "English", es: "Español" }` — keep both.
+- Set `lodging.url` to `null` to show a "find lodging nearby" search instead.
+- Emergency content is in `js/data/emergency.js`, packing in `js/data/packing.js`.
+
+## Local development
+
+ES modules need a server (not `file://`):
+
+```
+python3 -m http.server 8080   # then open http://localhost:8080
+```
+
+## QA checklist (before every release)
+
+- `node --check` every file in `js/` (syntax).
+- On a phone: all 6 tabs · open 3 days · create a profile · fill the emergency
+  card and share it · check 5 packing items · add a plan · switch ES + dark ·
+  airplane-mode reload (after first visit).
+- Desktop ≥ 900 px: top nav shows, tab bar hides.
 
 ## Roadmap
-Phase 3 chat assistant → Phase 4 wishlists/packing/emergency/weather → Phase 5 visual editor for Dad.
+
+Phase 4 (chat assistant) and Phase 5 (cross-device accounts & sync) are
+**built** — they switch on when the crew server is deployed
+(`docs/DEPLOY-SERVER.md`). Next: shared crew wishlist with votes, visual
+content editor. Full list: `docs/ROADMAP.md`.
