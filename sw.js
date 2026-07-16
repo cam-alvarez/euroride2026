@@ -4,7 +4,7 @@
      falling back to cache when offline.
    - Static assets & fonts: cache-first for speed, updated in background.
 */
-const CACHE = 'euroride-v2';
+const CACHE = 'euroride-v3';
 const PRECACHE = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
