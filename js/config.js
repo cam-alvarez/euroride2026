@@ -11,7 +11,7 @@
    see docs/DEPLOY-SERVER.md
    ===================================================================== */
 
-export const API_BASE = null;
+export const API_BASE = 'https://euroride-api.calvarez-accts.workers.dev';
 
 export function remoteEnabled() {
   return typeof API_BASE === 'string' && API_BASE.length > 0;
