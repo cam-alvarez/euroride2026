@@ -110,9 +110,11 @@ function renderThread(zone, user) {
       setHistory(user, h);
     } catch (err) {
       const h = getHistory(user);
+      /* err.status set → the server answered (show its reason, not "no signal");
+         no status → the request never got through (offline / blocked) */
       const msg = err.code === 'errRateLimit' ? tr('chat.errRateLimit')
-        : err.code === 'errNetwork' ? tr('chat.offline')
-        : tr('chat.errGeneric');
+        : err.status ? (err.detail || tr('chat.errGeneric'))
+        : tr('chat.offline');
       h.push({ role: 'note', content: msg });
       setHistory(user, h);
     } finally {
