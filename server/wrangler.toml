@@ -12,8 +12,10 @@ database_id = "17af40c5-a868-48c0-8576-b2c73f46abd1"
 
 [vars]
 # Comma-separated list of origins allowed to call this API.
-# Add your GitHub Pages origin, e.g. "https://<user>.github.io"
-ALLOWED_ORIGINS = "https://cam-alvarez.github.io,http://localhost:8080"
+# EVERY address the app is served from must be listed here (scheme + host,
+# no path, no trailing slash) — a missing one shows up in the browser as a
+# CORS error and in the app as "can't reach the crew server".
+ALLOWED_ORIGINS = "https://euroride2026.calvarez-accts.workers.dev,https://cam-alvarez.github.io,http://localhost:8080"
 CHAT_MODEL = "claude-haiku-4-5"  # cheapest option; "claude-opus-4-8" for the best answers
 CHAT_DAILY_LIMIT = "40"          # questions per rider per day
 
