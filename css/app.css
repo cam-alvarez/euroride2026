@@ -571,6 +571,7 @@ main#view:focus { outline: none; }
 .suggest-chip .sg-day { font-size: 10.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 2px; }
 
 /* ================== PROFILE ================== */
+.auth-wrap { max-width: 440px; margin: 0 auto; }
 .auth-tabs { margin-bottom: 4px; }
 .profile-chiprow { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 4px; }
 .profile-chip {

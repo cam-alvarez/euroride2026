@@ -230,6 +230,7 @@ export const STR = {
     errInvite: { en: 'Wrong invite code — ask the crew for it.', es: 'Código de invitación incorrecto — pídelo al grupo.' },
     errInsecureContext: { en: 'Profiles need a secure connection (https or localhost). Open the published site to create one.', es: 'Los perfiles requieren una conexión segura (https o localhost). Abre el sitio publicado para crear uno.' },
     errNetwork: { en: "Can't reach the crew server — check your signal and try again.", es: 'No se puede conectar al servidor del grupo — revisa tu señal e intenta de nuevo.' },
+    errServer: { en: 'The crew server hit an error — not your signal. Try again in a minute.', es: 'El servidor del grupo tuvo un error — no es tu señal. Intenta de nuevo en un minuto.' },
     errSession: { en: 'Your session expired — sign in again.', es: 'Tu sesión expiró — inicia sesión de nuevo.' },
     errRateLimit: { en: 'Too many attempts — wait a minute and try again.', es: 'Demasiados intentos — espera un minuto e intenta de nuevo.' },
     language: { en: 'Language', es: 'Idioma' },
