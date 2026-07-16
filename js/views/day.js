@@ -5,6 +5,7 @@
 import { TRIP, getDay, todayIndex } from '../data/trip.js';
 import { t, tr } from '../i18n.js';
 import { esc, icons, elevationStrip, openVideo } from '../ui.js';
+import { remoteEnabled } from '../config.js';
 
 const TYPE_LABEL = {
   ride: 'days.typeRide',
@@ -33,6 +34,9 @@ export function renderDay(view, param) {
   if (d.lodging?.area) {
     const weatherUrl = 'https://www.google.com/search?q=' + encodeURIComponent('weather ' + d.lodging.area);
     actions.push(`<a class="btn btn-ghost" href="${weatherUrl}" target="_blank" rel="noopener">${icons.cloud} ${esc(tr('days.weather'))}</a>`);
+  }
+  if (remoteEnabled()) {
+    actions.push(`<a class="btn btn-ghost" href="#/chat" id="ask-ai">💬 ${esc(tr('days.askAi'))}</a>`);
   }
 
   /* --- options (POIs / optional loops) --- */
@@ -126,5 +130,10 @@ export function renderDay(view, param) {
 
   view.querySelector('[data-video]')?.addEventListener('click', e => {
     openVideo(e.currentTarget.dataset.video);
+  });
+
+  /* seed the assistant with this day so the rider just finishes the question */
+  view.querySelector('#ask-ai')?.addEventListener('click', () => {
+    sessionStorage.setItem('er26.chatPrefill', `${tr('days.askSeed')} ${d.n} (${t(d.title)}): `);
   });
 }

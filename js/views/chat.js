@@ -12,13 +12,15 @@
    ===================================================================== */
 import { remoteEnabled } from '../config.js';
 import { api } from '../api.js';
-import { tr } from '../i18n.js';
+import { tr, getLang } from '../i18n.js';
 import { esc, icons } from '../ui.js';
+import { md } from '../markdown.js';
 import { currentUser } from '../auth.js';
 import { userStore } from '../store.js';
 
 const MAX_STORED = 40;   // messages kept on device
 const MAX_SENT = 12;     // recent messages sent to the model
+const PREFILL_KEY = 'er26.chatPrefill'; // set by day pages ("ask about this day")
 let pending = false;
 
 export function renderChat(view) {
@@ -58,14 +60,21 @@ export function renderChat(view) {
 function getHistory(user) { return userStore(user).get('chat', []); }
 function setHistory(user, messages) { userStore(user).set('chat', messages.slice(-MAX_STORED)); }
 
+function presetsHTML() {
+  const qs = [tr('chat.preset1'), tr('chat.preset2'), tr('chat.preset3'), tr('chat.preset4')];
+  return `
+    <div class="empty">${esc(tr('chat.empty'))}</div>
+    <div class="chat-presets" aria-label="${esc(tr('chat.tryAsking'))}">
+      ${qs.map(q => `<button type="button" class="chat-preset" data-q="${esc(q)}">${esc(q)}</button>`).join('')}
+    </div>`;
+}
+
 function renderThread(zone, user) {
   const history = getHistory(user);
 
   zone.innerHTML = `
     <div class="chat-thread" id="chat-thread" aria-live="polite">
-      ${history.length
-        ? history.map(bubbleHTML).join('')
-        : `<div class="empty">${esc(tr('chat.empty'))}</div>`}
+      ${history.length ? history.map(bubbleHTML).join('') : presetsHTML()}
       ${pending ? typingHTML() : ''}
     </div>
     <form class="chat-form" id="chat-form">
@@ -81,12 +90,8 @@ function renderThread(zone, user) {
   const thread = zone.querySelector('#chat-thread');
   thread.scrollTop = thread.scrollHeight;
 
-  zone.querySelector('#chat-form').addEventListener('submit', async e => {
-    e.preventDefault();
-    if (pending) return;
-    const input = zone.querySelector('#chat-input');
-    const text = input.value.trim();
-    if (!text) return;
+  async function send(text) {
+    if (pending || !text) return;
 
     if (!navigator.onLine) {
       appendSystemNote(zone, user, tr('chat.offline'));
@@ -104,7 +109,7 @@ function renderThread(zone, user) {
         .filter(m => m.role === 'user' || m.role === 'assistant')
         .slice(-MAX_SENT)
         .map(m => ({ role: m.role, content: m.content }));
-      const res = await api('/api/chat', { method: 'POST', body: { messages: payload } });
+      const res = await api('/api/chat', { method: 'POST', body: { messages: payload, lang: getLang() } });
       const h = getHistory(user);
       h.push({ role: 'assistant', content: String(res.reply || '').trim() || tr('chat.errGeneric') });
       setHistory(user, h);
@@ -121,6 +126,15 @@ function renderThread(zone, user) {
       pending = false;
       renderThread(zone, user);
     }
+  }
+
+  zone.querySelector('#chat-form').addEventListener('submit', e => {
+    e.preventDefault();
+    send(zone.querySelector('#chat-input').value.trim());
+  });
+
+  zone.querySelectorAll('.chat-preset').forEach(btn => {
+    btn.addEventListener('click', () => send(btn.dataset.q));
   });
 
   zone.querySelector('#chat-clear')?.addEventListener('click', () => {
@@ -129,7 +143,17 @@ function renderThread(zone, user) {
     renderThread(zone, user);
   });
 
-  if (!pending) zone.querySelector('#chat-input')?.focus();
+  if (!pending) {
+    const input = zone.querySelector('#chat-input');
+    /* a day page may have queued an "ask about this day" starter */
+    const prefill = sessionStorage.getItem(PREFILL_KEY);
+    if (prefill) {
+      sessionStorage.removeItem(PREFILL_KEY);
+      input.value = prefill;
+      input.setSelectionRange(input.value.length, input.value.length);
+    }
+    input?.focus();
+  }
 }
 
 function appendSystemNote(zone, user, text) {
@@ -143,8 +167,11 @@ function bubbleHTML(message) {
   if (message.role === 'note') {
     return `<div class="chat-note">${esc(message.content)}</div>`;
   }
-  const who = message.role === 'user' ? 'me' : 'bot';
-  return `<div class="chat-bubble chat-${who}">${esc(message.content)}</div>`;
+  if (message.role === 'user') {
+    return `<div class="chat-bubble chat-me">${esc(message.content)}</div>`;
+  }
+  /* assistant replies arrive as Markdown → render the safe subset */
+  return `<div class="chat-bubble chat-bot chat-md">${md(message.content)}</div>`;
 }
 
 function typingHTML() {
