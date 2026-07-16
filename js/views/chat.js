@@ -23,6 +23,7 @@ import { esc, icons } from '../ui.js';
 import { md } from '../markdown.js';
 import { currentUser } from '../auth.js';
 import { store, userStore } from '../store.js';
+import { openPlanEditor, detectDay } from '../plan-editor.js';
 
 const MAX_STORED = 30;   // messages kept per conversation
 const MAX_SENT = 12;     // recent messages sent to the model
@@ -284,6 +285,24 @@ function renderThread(zone, user) {
     renderThread(zone, user);
   });
 
+  /* "+" on a list item in an assistant reply → save that option as a plan */
+  thread.addEventListener('click', e => {
+    const btn = e.target.closest('.li-save');
+    if (!btn) return;
+    const item = btn.closest('li');
+    const title = (item.querySelector('.li-text')?.textContent || '').trim().slice(0, 120);
+    if (!title) return;
+    const link = item.querySelector('a[href^="http"]')?.href || null;
+    const bubbleText = btn.closest('.chat-bubble')?.textContent || '';
+    openPlanEditor(user, {
+      defaults: {
+        title,
+        link,
+        day: detectDay(title, bubbleText, conv?.title)
+      }
+    });
+  });
+
   if (!pending) {
     const input = zone.querySelector('#chat-input');
     /* a day page may have queued an "ask about this day" starter */
@@ -305,8 +324,9 @@ function bubbleHTML(message) {
   if (message.role === 'user') {
     return `<div class="chat-bubble chat-me">${esc(message.content)}</div>`;
   }
-  /* assistant replies arrive as Markdown → render the safe subset */
-  return `<div class="chat-bubble chat-bot chat-md">${md(message.content)}</div>`;
+  /* assistant replies arrive as Markdown → render the safe subset;
+     list items get a "+" so any suggested option can become a plan */
+  return `<div class="chat-bubble chat-bot chat-md">${md(message.content, { saveLabel: tr('chat.addPlan') })}</div>`;
 }
 
 function typingHTML() {

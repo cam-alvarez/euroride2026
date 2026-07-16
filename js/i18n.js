@@ -112,6 +112,9 @@ export const STR = {
     weather: { en: 'Weather', es: 'Clima' },
     askAi: { en: 'Ask the assistant', es: 'Pregunta al asistente' },
     askSeed: { en: 'About Day', es: 'Sobre el Día' },
+    myPlansTitle: { en: 'My plans for this day', es: 'Mis planes para este día' },
+    noPlansYet: { en: 'Nothing planned for this day yet.', es: 'Aún no hay planes para este día.' },
+    addPlanHere: { en: 'Add a plan', es: 'Añadir un plan' },
     lodging: { en: 'Lodging', es: 'Hospedaje' },
     lodgingTag: { en: 'Suggested · Not booked', es: 'Sugerencia · Sin reservar' },
     lodgingView: { en: 'View suggestion', es: 'Ver sugerencia' },
@@ -191,7 +194,9 @@ export const STR = {
     emptyPlans: { en: 'No plans yet. Add your first idea or grab a suggestion below.', es: 'Aún no hay planes. Agrega tu primera idea o toma una sugerencia de abajo.' },
     sharePlans: { en: 'Share my list', es: 'Compartir mi lista' },
     myPlansHeader: { en: 'MY EURORIDE 2026 PLANS', es: 'MIS PLANES EURORIDE 2026' },
-    added: { en: 'Added ✓', es: 'Agregado ✓' }
+    added: { en: 'Added ✓', es: 'Agregado ✓' },
+    editPlan: { en: 'Edit plan', es: 'Editar plan' },
+    savePlan: { en: 'Save plan', es: 'Guardar plan' }
   },
   chat: {
     title: { en: 'Trip Assistant', es: 'Asistente del Viaje' },
@@ -217,6 +222,7 @@ export const STR = {
     convLimit: { en: 'Conversation limit reached — delete an old one first.', es: 'Límite de conversaciones alcanzado — borra una antigua primero.' },
     noConvs: { en: 'No conversations yet — ask the assistant anything and it starts one for you.', es: 'Aún no hay conversaciones — pregúntale lo que sea al asistente y se creará una automáticamente.' },
     msgs: { en: 'messages', es: 'mensajes' },
+    addPlan: { en: 'Add to my plans', es: 'Añadir a mis planes' },
     preset1: { en: "What's the plan for the free days in Munich and Como?", es: '¿Cuál es el plan para los días libres en Múnich y Como?' },
     preset2: { en: 'What should I pack for the high passes?', es: '¿Qué debo llevar para los puertos de montaña?' },
     preset3: { en: 'How do tolls and vignettes work on this trip?', es: '¿Cómo funcionan los peajes y viñetas en este viaje?' },

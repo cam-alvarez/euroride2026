@@ -6,6 +6,8 @@ import { TRIP, getDay, todayIndex } from '../data/trip.js';
 import { t, tr } from '../i18n.js';
 import { esc, icons, elevationStrip, openVideo } from '../ui.js';
 import { remoteEnabled } from '../config.js';
+import { currentUser } from '../auth.js';
+import { openPlanEditor, getPlans, setPlans, KINDS, kindLabel } from '../plan-editor.js';
 
 const TYPE_LABEL = {
   ride: 'days.typeRide',
@@ -86,6 +88,36 @@ export function renderDay(view, param) {
         </div>` : '').join('')}
     </div>` : '';
 
+  /* --- the rider's own plans for this day --- */
+  const user = currentUser();
+  const myPlans = user ? getPlans(user).filter(p => Number(p.day) === d.n) : [];
+  const planRow = p => {
+    const safeKind = KINDS.includes(p.kind) ? p.kind : 'do';
+    const safeLink = p.link && /^https?:\/\//i.test(p.link) ? p.link : null;
+    return `
+      <div class="card plan-item">
+        <label class="checkrow" style="padding:0;flex:0 0 auto">
+          <input type="checkbox" data-plan-check="${esc(p.id)}" ${p.done ? 'checked' : ''} aria-label="${esc(p.title)}">
+        </label>
+        <div class="plan-main">
+          <div class="plan-title" ${p.done ? 'style="text-decoration:line-through;color:var(--faint)"' : ''}>${esc(p.title)}</div>
+          <div class="plan-meta">
+            <span class="kind-tag kind-${safeKind}">${esc(kindLabel(safeKind))}</span>
+            ${safeLink ? `<a href="${esc(safeLink)}" target="_blank" rel="noopener">↗ ${esc(tr('kit.linkLabel'))}</a>` : ''}
+          </div>
+        </div>
+        <button class="cr-edit" data-plan-edit="${esc(p.id)}" aria-label="${esc(tr('kit.editPlan'))}">✎</button>
+        <button class="cr-del" data-plan-del="${esc(p.id)}" aria-label="${esc(tr('common.delete'))}">${icons.trash}</button>
+      </div>`;
+  };
+  const plansBlock = user ? `
+    <h2 class="sec-title display">${esc(tr('days.myPlansTitle'))}</h2>
+    <div id="day-plans">
+      ${myPlans.length ? myPlans.map(planRow).join('')
+        : `<p class="card-sub" style="margin-bottom:10px">${esc(tr('days.noPlansYet'))}</p>`}
+      <button class="btn btn-ghost btn-sm" id="day-plan-add">+ ${esc(tr('days.addPlanHere'))}</button>
+    </div>` : '';
+
   /* --- prev / next --- */
   const prev = getDay(d.n - 1);
   const next = getDay(d.n + 1);
@@ -126,7 +158,35 @@ export function renderDay(view, param) {
     ${optionsBlock}
     ${lodgingBlock}
     ${notesBlock}
+    ${plansBlock}
     ${navFoot}`;
+
+  if (user) {
+    const rerenderDay = () => renderDay(view, param);
+    view.querySelector('#day-plan-add').addEventListener('click', () => {
+      openPlanEditor(user, { defaults: { day: d.n }, onSaved: rerenderDay });
+    });
+    view.querySelector('#day-plans').addEventListener('click', e => {
+      const editId = e.target.closest('[data-plan-edit]')?.dataset.planEdit;
+      if (editId) {
+        const plan = getPlans(user).find(p => p.id === editId);
+        if (plan) openPlanEditor(user, { plan, onSaved: rerenderDay });
+        return;
+      }
+      const delId = e.target.closest('[data-plan-del]')?.dataset.planDel;
+      if (delId) {
+        setPlans(user, getPlans(user).filter(p => p.id !== delId));
+        rerenderDay();
+      }
+    });
+    view.querySelector('#day-plans').addEventListener('change', e => {
+      const checkId = e.target.dataset?.planCheck;
+      if (!checkId) return;
+      const plans = getPlans(user);
+      const p = plans.find(x => x.id === checkId);
+      if (p) { p.done = e.target.checked; setPlans(user, plans); rerenderDay(); }
+    });
+  }
 
   view.querySelector('[data-video]')?.addEventListener('click', e => {
     openVideo(e.currentTarget.dataset.video);
