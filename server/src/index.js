@@ -140,6 +140,15 @@ async function handleRegister(request, env, cors) {
 
   const body = await readBody(request, 4096);
   if (!body) return json({ error: 'bad_request' }, 400, cors);
+
+  /* invite gate: when the INVITE_CODE secret is set, only people who know
+     the crew's code can create an account (protects the chat budget) */
+  if (env.INVITE_CODE) {
+    if (!safeEqual(String(body.invite || ''), String(env.INVITE_CODE))) {
+      return json({ error: 'bad_invite' }, 403, cors);
+    }
+  }
+
   const name = String(body.username || '').trim();
   const authKey = String(body.authKey || '');
   const key = normalize(name);

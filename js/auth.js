@@ -98,16 +98,16 @@ export function currentUser() {
   return rec ? rec.name : null;
 }
 
-export async function register(username, password) {
+export async function register(username, password, invite = '') {
   if (!crypto.subtle) return { ok: false, error: 'errInsecureContext' };
   const name = String(username || '').trim();
   if (!validUsername(name)) return { ok: false, error: 'errUserInvalid' };
-  if (String(password || '').length < 4) return { ok: false, error: 'errPwShort' };
+  if (String(password || '').length < 8) return { ok: false, error: 'errPwShort' };
 
   if (remoteEnabled()) {
     try {
       const authKey = await deriveAuthKey(name, password);
-      const res = await api('/api/register', { method: 'POST', auth: false, body: { username: name, authKey } });
+      const res = await api('/api/register', { method: 'POST', auth: false, body: { username: name, authKey, invite } });
       setToken(res.token);
       store.set(SESSION_KEY, normalize(name));
       store.set(REMOTE_NAME_KEY, res.username || name);

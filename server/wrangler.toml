@@ -14,8 +14,9 @@ database_id = "REPLACE_WITH_YOUR_DATABASE_ID"
 # Comma-separated list of origins allowed to call this API.
 # Add your GitHub Pages origin, e.g. "https://<user>.github.io"
 ALLOWED_ORIGINS = "http://localhost:8080"
-CHAT_MODEL = "claude-opus-4-8"   # or "claude-haiku-4-5" to trade quality for lower cost
+CHAT_MODEL = "claude-haiku-4-5"  # cheapest option; "claude-opus-4-8" for the best answers
 CHAT_DAILY_LIMIT = "40"          # questions per rider per day
 
-# Secrets (never in this file):
-#   npx wrangler secret put ANTHROPIC_API_KEY
+# Secrets (never in this file — this repo is public):
+#   npx wrangler secret put ANTHROPIC_API_KEY   (your console.anthropic.com key)
+#   npx wrangler secret put INVITE_CODE         (the code new riders must type to register)

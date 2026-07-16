@@ -39,7 +39,12 @@ npx wrangler d1 execute euroride --remote --file=schema.sql
 # 5. Store the Anthropic key as a secret (never in code)
 npx wrangler secret put ANTHROPIC_API_KEY
 
-# 6. Ship it
+# 6. Set the crew invite code (new riders must type it to register —
+#    keeps strangers off your server and your chat budget). Type the
+#    code when prompted; it is stored encrypted, never in the repo.
+npx wrangler secret put INVITE_CODE
+
+# 7. Ship it
 npx wrangler deploy
 ```
 
@@ -60,9 +65,10 @@ accounts, and the Chat tab comes alive. That's it.
 
 | Var | Default | Meaning |
 |---|---|---|
-| `CHAT_MODEL` | `claude-opus-4-8` | The model behind the assistant. `claude-haiku-4-5` is the cheaper/faster option if costs matter more than answer quality. |
+| `CHAT_MODEL` | `claude-haiku-4-5` | The model behind the assistant. Switch to `claude-opus-4-8` for noticeably better answers at ~5x the (still small) cost. |
 | `CHAT_DAILY_LIMIT` | `40` | Questions per rider per day (protects your API budget). |
 | `ALLOWED_ORIGINS` | localhost | Comma-separated origins allowed to call the API. |
+| `INVITE_CODE` (secret) | unset | When set, registration requires this code. Set it with `wrangler secret put INVITE_CODE`; share it with the crew privately (group chat), never in the repo. |
 
 Cost notes: the Worker and D1 free tiers cover this crew hundreds of times
 over. Chat cost is dominated by the model; the trip context is served from
@@ -84,7 +90,7 @@ cd server && npx wrangler deploy
 ```bash
 cd server
 npx wrangler d1 execute euroride --local --file=schema.sql   # once
-npx wrangler dev --local --var DEV_FAKE_CHAT:1               # API on :8787
+npx wrangler dev --local --var DEV_FAKE_CHAT:1 --var INVITE_CODE:testcode
 ```
 
 `DEV_FAKE_CHAT=1` makes `/api/chat` return a canned reply so you can test
@@ -93,7 +99,10 @@ in `js/config.js` while testing (localhost is already in `ALLOWED_ORIGINS`).
 
 ## Security model (what your dad can tell the crew)
 
-- No email, no personal data required — username + password only.
+- No email, no personal data required — username + password only
+  (minimum 8 characters; tell the crew to pick one they don't reuse).
+- Registration is invite-gated: without the crew code, strangers cannot
+  create accounts or reach the assistant.
 - Passwords never leave the phone: the app derives a scrambled key
   (PBKDF2, 120k rounds) and only that crosses the wire over HTTPS; the
   server stores a salted hash of it.

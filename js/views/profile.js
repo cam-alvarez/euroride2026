@@ -46,7 +46,10 @@ function renderSignedOut(view) {
         <input name="password" type="password" autocomplete="${mode === 'create' ? 'new-password' : 'current-password'}" required></label>
       ${mode === 'create' ? `
         <label class="field"><span>${esc(tr('profile.password2'))}</span>
-          <input name="password2" type="password" autocomplete="new-password" required></label>` : ''}
+          <input name="password2" type="password" autocomplete="new-password" required></label>
+        ${remoteEnabled() ? `
+        <label class="field"><span>${esc(tr('profile.invite'))}</span>
+          <input name="invite" autocomplete="off" required placeholder="${esc(tr('profile.inviteHint'))}"></label>` : ''}` : ''}
       <p class="form-err" id="auth-err" role="alert"></p>
       <button class="btn btn-block" type="submit">
         ${icons.user} ${esc(mode === 'create' ? tr('profile.create') : tr('profile.login'))}
@@ -83,7 +86,7 @@ function renderSignedOut(view) {
         err.textContent = tr('profile.errPwMatch');
         return;
       }
-      res = await register(username, password);
+      res = await register(username, password, String(f.get('invite') || '').trim());
     } else {
       res = await login(username, password);
     }

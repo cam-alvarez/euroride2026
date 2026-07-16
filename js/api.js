@@ -18,6 +18,7 @@ const ERROR_MAP = {
   invalid_username: 'errUserInvalid',
   weak_password: 'errPwShort',
   bad_credentials: 'errLogin',
+  bad_invite: 'errInvite',
   unauthorized: 'errSession',
   rate_limited: 'errRateLimit'
 };
