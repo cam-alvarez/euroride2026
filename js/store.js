@@ -51,7 +51,12 @@ export function userStore(username) {
       if (writeHook) { try { writeHook(user, key, value); } catch { /* sync must not break the UI */ } }
       return ok;
     },
-    remove: (key) => store.remove(prefix + key)
+    remove: (key) => {
+      store.remove(prefix + key);
+      /* removals sync too (del flag) — otherwise deleted conversations
+         would resurrect from the server on the next login */
+      if (writeHook) { try { writeHook(user, key, undefined, true); } catch { /* ditto */ } }
+    }
   };
 }
 

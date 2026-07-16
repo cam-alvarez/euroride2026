@@ -12,11 +12,12 @@ import { store, registerWriteHook, writeUserValueRaw } from './store.js';
 
 const QUEUE_KEY = 'syncq';
 let flushing = false;
+let rerun = false; // a write landed while a flush was in-flight
 
 export function initSync() {
   if (!remoteEnabled()) return;
-  registerWriteHook((user, key) => {
-    enqueue(user, key);
+  registerWriteHook((user, key, _value, del) => {
+    enqueue(user, key, del);
     flush();
   });
   window.addEventListener('online', flush);
@@ -26,40 +27,62 @@ export function initSync() {
 function getQueue() { return store.get(QUEUE_KEY, []); }
 function setQueue(q) { store.set(QUEUE_KEY, q); }
 
-function enqueue(user, key) {
-  const q = getQueue();
-  if (!q.some(item => item.u === user && item.k === key)) {
-    q.push({ u: user, k: key });
-    setQueue(q);
-  }
+let seq = 0;
+const stamp = () => Date.now().toString(36) + '.' + (seq++);
+
+function enqueue(user, key, del) {
+  /* latest op per key wins: a set after a pending delete (or vice versa)
+     replaces it, so the server always converges on the newest intent.
+     Each item carries a unique stamp so flush can drop exactly the item
+     it processed — never a newer one enqueued for the same key. */
+  const q = getQueue().filter(item => !(item.u === user && item.k === key));
+  q.push(del ? { u: user, k: key, s: stamp(), d: 1 } : { u: user, k: key, s: stamp() });
+  setQueue(q);
 }
 
-/** Push queued writes to the server. Safe to call anytime. */
+/* Every queue mutation re-reads localStorage first: flush must never hold
+   a stale copy, or it would clobber items enqueued while a request was
+   in flight (that exact bug ate deletions once). */
+const dropItem = item => setQueue(getQueue().filter(x => x.s !== item.s));
+
+/** Push queued writes to the server. Safe to call anytime. Writes that
+    arrive while a flush is running are picked up by a follow-up pass —
+    without this they would idle in the queue until the next write. */
 export async function flush() {
-  if (!remoteEnabled() || flushing || !navigator.onLine || !getToken()) return;
+  if (!remoteEnabled() || !navigator.onLine || !getToken()) return;
+  if (flushing) { rerun = true; return; }
   flushing = true;
   try {
-    let q = getQueue();
-    const session = store.get('session', null);
-    for (const item of [...q]) {
-      if (item.u !== session) {
-        // A different user's leftover write — drop it; it re-syncs on their next login.
-        q = q.filter(x => x !== item); setQueue(q);
-        continue;
+    /* items persisted by an older app version have no stamp — give them one */
+    const q0 = getQueue();
+    if (q0.some(i => !i.s)) setQueue(q0.map(i => (i.s ? i : { ...i, s: stamp() })));
+
+    let halted = false;
+    do {
+      rerun = false;
+      const session = store.get('session', null);
+      for (const item of getQueue()) {
+        if (item.u !== session) {
+          // A different user's leftover write — drop it; it re-syncs on their next login.
+          dropItem(item);
+          continue;
+        }
+        try {
+          if (item.d) {
+            await api('/api/data/' + encodeURIComponent(item.k), { method: 'DELETE' });
+          } else {
+            const value = store.get('u.' + item.u + '.' + item.k, null);
+            await api('/api/data/' + encodeURIComponent(item.k), { method: 'PUT', body: { value } });
+          }
+          dropItem(item);
+        } catch (e) {
+          if (e.code === 'errNetwork' || e.status >= 500 || e.status === 401) {
+            halted = true; break; // retryable — keep the queue, stop this round
+          }
+          dropItem(item); // permanent → drop
+        }
       }
-      const value = store.get('u.' + item.u + '.' + item.k, null);
-      try {
-        await api('/api/data/' + encodeURIComponent(item.k), { method: 'PUT', body: { value } });
-        q = q.filter(x => !(x.u === item.u && x.k === item.k));
-        setQueue(q);
-      } catch (e) {
-        if (e.code === 'errNetwork') break;       // try again when back online
-        if (e.status >= 500) break;               // server hiccup — keep and retry
-        if (e.status === 401) break;              // token expired; retry after next login
-        q = q.filter(x => !(x.u === item.u && x.k === item.k)); // permanent → drop
-        setQueue(q);
-      }
-    }
+    } while (!halted && (rerun || getQueue().length));
   } finally {
     flushing = false;
   }
