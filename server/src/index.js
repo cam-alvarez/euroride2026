@@ -277,12 +277,17 @@ async function handleChat(request, session, env, cors) {
   }
 
   const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
+  const model = env.CHAT_MODEL || 'claude-opus-4-8';
+  // adaptive thinking exists on Opus 4.6+/Sonnet 4.6+/Sonnet 5/Fable 5 —
+  // older tiers (e.g. Haiku 4.5) reject the parameter, so send it only
+  // where it is supported
+  const supportsAdaptiveThinking = /opus-4-[6-9]|sonnet-4-[6-9]|sonnet-5|fable|mythos/.test(model);
   let response;
   try {
     response = await client.messages.create({
-      model: env.CHAT_MODEL || 'claude-opus-4-8',
+      model,
       max_tokens: 1024, // deliberate cost cap: trip answers are short
-      thinking: { type: 'adaptive' },
+      ...(supportsAdaptiveThinking ? { thinking: { type: 'adaptive' } } : {}),
       system: [
         // the big trip context is identical on every call → prompt caching
         // makes repeat questions cost ~10% of the first one
@@ -292,7 +297,10 @@ async function handleChat(request, session, env, cors) {
     });
   } catch (err) {
     if (err instanceof Anthropic.RateLimitError) return json({ error: 'rate_limited' }, 429, cors);
-    return json({ error: 'bad_request', message: 'model call failed' }, 502, cors);
+    // surface WHY it failed so the admin can act (bad key, no credit, bad model…)
+    const detail = 'model error' + (err?.status ? ' ' + err.status : '') + ': ' +
+      String(err?.message || 'unknown').slice(0, 300);
+    return json({ error: 'chat_failed', message: detail }, 502, cors);
   }
 
   if (response.stop_reason === 'refusal') {
