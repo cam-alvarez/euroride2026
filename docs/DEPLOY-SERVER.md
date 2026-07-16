@@ -33,8 +33,9 @@ npx wrangler d1 create euroride
 # 3. Create the tables
 npx wrangler d1 execute euroride --remote --file=schema.sql
 
-# 4. Allow your site to call the API: edit ALLOWED_ORIGINS in wrangler.toml,
-#    e.g.  ALLOWED_ORIGINS = "https://<your-user>.github.io"
+# 4. Allow your site to call the API: edit ALLOWED_ORIGINS in wrangler.toml.
+#    List EVERY address the app is served from (GitHub Pages, a workers.dev
+#    site, a custom domain…) — scheme + host only, comma-separated.
 
 # 5. Store the Anthropic key as a secret (never in code)
 npx wrangler secret put ANTHROPIC_API_KEY
