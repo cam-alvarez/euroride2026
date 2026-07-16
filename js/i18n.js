@@ -110,6 +110,8 @@ export const STR = {
     routeMap: { en: 'Route map', es: 'Mapa de ruta' },
     video: { en: 'Watch the road', es: 'Ver la carretera' },
     weather: { en: 'Weather', es: 'Clima' },
+    askAi: { en: 'Ask the assistant', es: 'Pregunta al asistente' },
+    askSeed: { en: 'About Day', es: 'Sobre el Día' },
     lodging: { en: 'Lodging', es: 'Hospedaje' },
     lodgingTag: { en: 'Suggested · Not booked', es: 'Sugerencia · Sin reservar' },
     lodgingView: { en: 'View suggestion', es: 'Ver sugerencia' },
@@ -204,7 +206,12 @@ export const STR = {
     offline: { en: 'The assistant needs signal. Everything else in the app works offline.', es: 'El asistente necesita señal. Todo lo demás en la app funciona sin conexión.' },
     errGeneric: { en: "Couldn't get an answer — try again.", es: 'No se pudo obtener respuesta — intenta de nuevo.' },
     errRateLimit: { en: 'Daily question limit reached — resets tomorrow.', es: 'Límite diario de preguntas alcanzado — se reinicia mañana.' },
-    disclaimer: { en: 'AI answers — double-check anything safety-critical.', es: 'Respuestas de IA — verifica todo lo crítico para la seguridad.' }
+    disclaimer: { en: 'AI answers — double-check anything safety-critical.', es: 'Respuestas de IA — verifica todo lo crítico para la seguridad.' },
+    tryAsking: { en: 'Try asking', es: 'Prueba preguntar' },
+    preset1: { en: "What's the plan for the free days in Munich and Como?", es: '¿Cuál es el plan para los días libres en Múnich y Como?' },
+    preset2: { en: 'What should I pack for the high passes?', es: '¿Qué debo llevar para los puertos de montaña?' },
+    preset3: { en: 'How do tolls and vignettes work on this trip?', es: '¿Cómo funcionan los peajes y viñetas en este viaje?' },
+    preset4: { en: 'Where do we sleep each night?', es: '¿Dónde dormimos cada noche?' }
   },
   profile: {
     title: { en: 'Rider Profile', es: 'Perfil del Piloto' },

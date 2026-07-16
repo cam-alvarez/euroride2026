@@ -36,6 +36,10 @@ personal bookings), say so honestly and point to what IS in the plan. For anythi
 remind riders to double-check on the ground. Do not invent facts, dates, or prices that are not in
 the trip facts.
 
+Formatting: the app renders simple Markdown only. Use short paragraphs, **bold** for key names or
+numbers, and dash bullet lists. Never use tables, images, or nested lists. Keep answers compact —
+phone screens.
+
 TRIP FACTS:
 ${TRIP_CONTEXT}`;
 
@@ -278,6 +282,12 @@ async function handleChat(request, session, env, cors) {
 
   const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
   const model = env.CHAT_MODEL || 'claude-opus-4-8';
+  /* one language per reply — the model was seen mixing EN/ES because the
+     crew is bilingual. The app sends its UI language as the tiebreaker. */
+  const appLang = body.lang === 'es' ? 'Spanish' : 'English';
+  const langNote = `Write your ENTIRE reply in one language — the language of the rider's most ` +
+    `recent message. Never mix English and Spanish in a reply. If the message could be either ` +
+    `(a name, a number, an emoji), use ${appLang}, the language the rider's app is set to.`;
   // adaptive thinking exists on Opus 4.6+/Sonnet 4.6+/Sonnet 5/Fable 5 —
   // older tiers (e.g. Haiku 4.5) reject the parameter, so send it only
   // where it is supported
@@ -291,7 +301,9 @@ async function handleChat(request, session, env, cors) {
       system: [
         // the big trip context is identical on every call → prompt caching
         // makes repeat questions cost ~10% of the first one
-        { type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }
+        { type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } },
+        // varies per rider → AFTER the cached block so the cache still hits
+        { type: 'text', text: langNote }
       ],
       messages
     });
