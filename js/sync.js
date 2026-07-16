@@ -54,6 +54,7 @@ export async function flush() {
         setQueue(q);
       } catch (e) {
         if (e.code === 'errNetwork') break;       // try again when back online
+        if (e.status >= 500) break;               // server hiccup — keep and retry
         if (e.status === 401) break;              // token expired; retry after next login
         q = q.filter(x => !(x.u === item.u && x.k === item.k)); // permanent → drop
         setQueue(q);

@@ -114,7 +114,7 @@ export async function register(username, password, invite = '') {
       flush(); // push any data created before signing in? (queue is per-user, harmless)
       return { ok: true, name: res.username || name };
     } catch (e) {
-      return { ok: false, error: e.code || 'errNetwork' };
+      return { ok: false, error: e.code || 'errNetwork', detail: e.detail };
     }
   }
 
@@ -145,7 +145,7 @@ export async function login(username, password) {
       flush();
       return { ok: true, name: res.username || String(username).trim() };
     } catch (e) {
-      return { ok: false, error: e.code || 'errNetwork' };
+      return { ok: false, error: e.code || 'errNetwork', detail: e.detail };
     }
   }
 
@@ -180,7 +180,7 @@ export async function deleteProfile(username, password) {
       store.remove(SESSION_KEY);
       return { ok: true };
     } catch (e) {
-      return { ok: false, error: e.code || 'errNetwork' };
+      return { ok: false, error: e.code || 'errNetwork', detail: e.detail };
     }
   }
 

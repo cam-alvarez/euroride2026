@@ -29,12 +29,13 @@ function renderSignedOut(view) {
       <p class="view-sub">${esc(tr(remoteEnabled() ? 'profile.heroSubRemote' : 'profile.heroSub'))}</p>
     </div>
 
+    <div class="auth-wrap">
     <div class="seg auth-tabs">
       <button data-mode="login" aria-pressed="${mode === 'login'}">${esc(tr('profile.login'))}</button>
       <button data-mode="create" aria-pressed="${mode === 'create'}">${esc(tr('profile.create'))}</button>
     </div>
 
-    <form class="card card-pad" id="auth-form" style="max-width:440px">
+    <form class="card card-pad" id="auth-form">
       ${profiles.length && mode === 'login' ? `
         <div class="card-sub" style="margin-bottom:4px">${esc(tr('profile.existing'))}</div>
         <div class="profile-chiprow">
@@ -55,6 +56,7 @@ function renderSignedOut(view) {
         ${icons.user} ${esc(mode === 'create' ? tr('profile.create') : tr('profile.login'))}
       </button>
     </form>
+    </div>
 
     ${settingsCard()}
     ${privacyCard()}`;
@@ -91,7 +93,9 @@ function renderSignedOut(view) {
       res = await login(username, password);
     }
     if (!res.ok) {
-      err.textContent = tr('profile.' + res.error);
+      /* res.detail = the server's own reason (e.g. "internal error") — gold
+         for debugging a fresh deployment, meaningless to hide */
+      err.textContent = tr('profile.' + res.error) + (res.detail ? ` (${res.detail})` : '');
       return;
     }
     toast(`${tr('profile.signedInAs')} ${res.name} ✓`);
@@ -183,7 +187,7 @@ function renderSignedIn(view, user) {
       const password = String(new FormData(e.target).get('password') || '');
       const res = await deleteProfile(user, password);
       if (!res.ok) {
-        document.getElementById('del-err').textContent = tr('profile.' + res.error);
+        document.getElementById('del-err').textContent = tr('profile.' + res.error) + (res.detail ? ` (${res.detail})` : '');
         return;
       }
       closeModal();

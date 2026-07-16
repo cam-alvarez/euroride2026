@@ -41,7 +41,8 @@ export async function api(path, { method = 'GET', body, auth = true } = {}) {
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     const err = new Error(data.error || String(res.status));
-    err.code = ERROR_MAP[data.error] || 'errNetwork';
+    /* the server DID answer — never report this as a signal problem */
+    err.code = ERROR_MAP[data.error] || 'errServer';
     err.status = res.status;
     err.detail = data.message;
     throw err;
