@@ -12,10 +12,12 @@
 import { store } from './store.js';
 import { getLang, setLang, tr } from './i18n.js';
 import { icons, esc, openShare, closeModal } from './ui.js';
+import { initSync } from './sync.js';
 import { renderHome } from './views/home.js';
 import { renderDays } from './views/days.js';
 import { renderDay } from './views/day.js';
 import { renderSos } from './views/sos.js';
+import { renderChat } from './views/chat.js';
 import { renderKit } from './views/kit.js';
 import { renderProfile } from './views/profile.js';
 
@@ -23,6 +25,7 @@ const NAV = [
   { id: 'home', hash: '#/home', icon: 'home', label: 'nav.home' },
   { id: 'days', hash: '#/days', icon: 'route', label: 'nav.days' },
   { id: 'sos', hash: '#/sos', icon: 'sos', label: 'nav.sos' },
+  { id: 'chat', hash: '#/chat', icon: 'chat', label: 'nav.chat' },
   { id: 'kit', hash: '#/kit', icon: 'kit', label: 'nav.kit' },
   { id: 'profile', hash: '#/profile', icon: 'user', label: 'nav.profile' }
 ];
@@ -32,6 +35,7 @@ const ROUTES = {
   days: { render: renderDays, nav: 'days' },
   day: { render: renderDay, nav: 'days' },
   sos: { render: renderSos, nav: 'sos' },
+  chat: { render: renderChat, nav: 'chat' },
   kit: { render: renderKit, nav: 'kit' },
   profile: { render: renderProfile, nav: 'profile' }
 };
@@ -121,6 +125,7 @@ export function rerender() {
 function boot() {
   document.documentElement.lang = getLang();
   applyTheme();
+  initSync();
 
   document.getElementById('lang-pill').addEventListener('click', e => {
     const lang = e.target.closest('button')?.dataset.lang;

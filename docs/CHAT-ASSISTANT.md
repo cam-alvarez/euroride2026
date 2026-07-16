@@ -1,5 +1,10 @@
 # Chat Assistant — Design (Phase 4)
 
+> **STATUS: BUILT.** The design below is implemented — the Worker lives in
+> `server/` (endpoint `/api/chat`, crew-only, rate-limited, prompt-cached)
+> and the UI is the Chat tab (`js/views/chat.js`). To turn it on, follow
+> `docs/DEPLOY-SERVER.md`. This document remains as the design rationale.
+
 The requested feature: a trip assistant on the site that answers questions
 like *"How cold is Stelvio?"*, *"What's the toll situation on day 7?"*,
 *"Where do we sleep on the 23rd?"*.

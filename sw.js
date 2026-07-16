@@ -12,7 +12,7 @@
    Everything the app needs is precached: the whole itinerary, SOS screen
    and personal data work with zero signal in the mountains.
 */
-const CACHE = 'euroride-v5';
+const CACHE = 'euroride-v6';
 const FONT_CACHE = 'euroride-fonts-v1';
 const NAV_TIMEOUT_MS = 4000;
 
@@ -25,11 +25,13 @@ const PRECACHE = [
   './icon-512.png',
   './css/app.css',
   './js/app.js',
+  './js/config.js',
+  './js/api.js',
+  './js/sync.js',
   './js/i18n.js',
   './js/store.js',
   './js/auth.js',
   './js/ui.js',
-  './js/map.js',
   './js/data/trip.js',
   './js/data/emergency.js',
   './js/data/packing.js',
@@ -37,6 +39,7 @@ const PRECACHE = [
   './js/views/days.js',
   './js/views/day.js',
   './js/views/sos.js',
+  './js/views/chat.js',
   './js/views/kit.js',
   './js/views/profile.js'
 ];

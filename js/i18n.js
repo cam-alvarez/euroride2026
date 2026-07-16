@@ -42,6 +42,7 @@ export const STR = {
     home: { en: 'Home', es: 'Inicio' },
     days: { en: 'Days', es: 'Días' },
     sos: { en: 'SOS', es: 'SOS' },
+    chat: { en: 'Chat', es: 'Chat' },
     kit: { en: 'Kit', es: 'Kit' },
     profile: { en: 'You', es: 'Tú' }
   },
@@ -75,6 +76,18 @@ export const STR = {
     },
     countdown: { en: 'days to rollout', es: 'días para rodar' },
     countdownOne: { en: 'day to rollout', es: 'día para rodar' },
+    hi: { en: 'Hey', es: 'Hola' },
+    quickTitle: { en: 'Quick Access', es: 'Acceso Rápido' },
+    qaToday: { en: "Today's ride", es: 'La ruta de hoy' },
+    qaFirstRide: { en: 'First ride', es: 'Primera ruta' },
+    qaLastDay: { en: 'Final day', es: 'Último día' },
+    qaSos: { en: 'Emergency', es: 'Emergencia' },
+    qaSosSub: { en: 'Works offline', es: 'Funciona sin conexión' },
+    qaPacking: { en: 'Packing', es: 'Equipaje' },
+    qaPackingSub: { en: 'Checklist for the Alps', es: 'Lista para los Alpes' },
+    qaPlans: { en: 'Plans', es: 'Planes' },
+    qaPlansSub: { en: 'Things to do & eat', es: 'Cosas para hacer y comer' },
+    qaPlansCount: { en: 'saved', es: 'guardados' },
     tripDone: { en: 'Mission accomplished. Until the next one!', es: 'Misión cumplida. ¡Hasta la próxima!' },
     todayBrief: { en: "Today's ride", es: 'La ruta de hoy' },
     openToday: { en: 'Open today', es: 'Ver el día de hoy' },
@@ -178,9 +191,25 @@ export const STR = {
     myPlansHeader: { en: 'MY EURORIDE 2026 PLANS', es: 'MIS PLANES EURORIDE 2026' },
     added: { en: 'Added ✓', es: 'Agregado ✓' }
   },
+  chat: {
+    title: { en: 'Trip Assistant', es: 'Asistente del Viaje' },
+    sub: { en: 'Ask anything about the route, tolls, weather, lodging or the plan for any day.', es: 'Pregunta lo que sea sobre la ruta, peajes, clima, hospedaje o el plan de cualquier día.' },
+    placeholder: { en: 'e.g. How cold is Stelvio? What tolls on day 7?', es: 'ej. ¿Qué frío hace en el Stelvio? ¿Qué peajes hay el día 7?' },
+    send: { en: 'Send', es: 'Enviar' },
+    thinking: { en: 'Thinking…', es: 'Pensando…' },
+    empty: { en: 'The assistant knows the whole itinerary — every day, pass, hotel and toll. Ask in English or Spanish.', es: 'El asistente conoce todo el itinerario — cada día, paso, hotel y peaje. Pregunta en español o inglés.' },
+    clear: { en: 'Clear conversation', es: 'Borrar conversación' },
+    needsSetup: { en: 'The assistant needs the crew server, which is not set up yet. It takes ~15 minutes and is free — see docs/DEPLOY-SERVER.md in the project. Everything else in the app works without it.', es: 'El asistente necesita el servidor del grupo, que aún no está configurado. Toma ~15 minutos y es gratis — mira docs/DEPLOY-SERVER.md en el proyecto. Todo lo demás en la app funciona sin él.' },
+    needsSignIn: { en: 'Sign in to use the trip assistant — it is reserved for the crew.', es: 'Inicia sesión para usar el asistente — está reservado para el grupo.' },
+    offline: { en: 'The assistant needs signal. Everything else in the app works offline.', es: 'El asistente necesita señal. Todo lo demás en la app funciona sin conexión.' },
+    errGeneric: { en: "Couldn't get an answer — try again.", es: 'No se pudo obtener respuesta — intenta de nuevo.' },
+    errRateLimit: { en: 'Daily question limit reached — resets tomorrow.', es: 'Límite diario de preguntas alcanzado — se reinicia mañana.' },
+    disclaimer: { en: 'AI answers — double-check anything safety-critical.', es: 'Respuestas de IA — verifica todo lo crítico para la seguridad.' }
+  },
   profile: {
     title: { en: 'Rider Profile', es: 'Perfil del Piloto' },
     heroSub: { en: 'A profile keeps your emergency card, packing list and plans — username and password only, no email, nothing leaves this device.', es: 'Tu perfil guarda tu tarjeta de emergencia, equipaje y planes — solo usuario y contraseña, sin correo, nada sale de este dispositivo.' },
+    heroSubRemote: { en: 'One account for your emergency card, packing list, plans and the trip assistant — username and password only, no email. Works on all your devices.', es: 'Una cuenta para tu tarjeta de emergencia, equipaje, planes y el asistente del viaje — solo usuario y contraseña, sin correo. Funciona en todos tus dispositivos.' },
     username: { en: 'Username', es: 'Usuario' },
     password: { en: 'Password', es: 'Contraseña' },
     password2: { en: 'Repeat password', es: 'Repite la contraseña' },
@@ -197,6 +226,9 @@ export const STR = {
     errPwMatch: { en: "Passwords don't match.", es: 'Las contraseñas no coinciden.' },
     errLogin: { en: 'Wrong username or password.', es: 'Usuario o contraseña incorrectos.' },
     errInsecureContext: { en: 'Profiles need a secure connection (https or localhost). Open the published site to create one.', es: 'Los perfiles requieren una conexión segura (https o localhost). Abre el sitio publicado para crear uno.' },
+    errNetwork: { en: "Can't reach the crew server — check your signal and try again.", es: 'No se puede conectar al servidor del grupo — revisa tu señal e intenta de nuevo.' },
+    errSession: { en: 'Your session expired — sign in again.', es: 'Tu sesión expiró — inicia sesión de nuevo.' },
+    errRateLimit: { en: 'Too many attempts — wait a minute and try again.', es: 'Demasiados intentos — espera un minuto e intenta de nuevo.' },
     language: { en: 'Language', es: 'Idioma' },
     theme: { en: 'Theme', es: 'Tema' },
     themeLight: { en: 'Light', es: 'Claro' },
@@ -212,6 +244,10 @@ export const STR = {
     privacyBody: {
       en: 'Everything lives in this browser on this device — nothing is sent to a server. The password keeps profiles separate on a shared phone; it is not bank-grade security. Clearing the browser data erases it, so use the download button for a backup.',
       es: 'Todo vive en este navegador y dispositivo — nada se envía a un servidor. La contraseña separa los perfiles en un teléfono compartido; no es seguridad bancaria. Borrar los datos del navegador lo elimina, así que usa el botón de descarga como respaldo.'
+    },
+    privacyBodyRemote: {
+      en: "Your data is stored on the crew's own server (and cached on this device so it works offline in the mountains). Your password never leaves this device — only a scrambled key derived from it. Signing out removes your data from this device.",
+      es: 'Tus datos se guardan en el servidor del grupo (y se almacenan en este dispositivo para funcionar sin conexión en la montaña). Tu contraseña nunca sale de este dispositivo — solo una clave cifrada derivada de ella. Al cerrar sesión, tus datos se borran de este dispositivo.'
     },
     about: { en: 'About', es: 'Acerca de' },
     aboutBody: { en: 'Euroride 2026 · v3.0 · Built by the crew, for the crew.', es: 'Euroride 2026 · v3.0 · Hecha por el grupo, para el grupo.' },

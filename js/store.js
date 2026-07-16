@@ -34,14 +34,31 @@ export const store = {
   }
 };
 
+/* Optional write hook: the sync layer registers itself here so every
+   per-user write can be pushed to the crew server when one is configured.
+   The hook must never throw into the caller. */
+let writeHook = null;
+export function registerWriteHook(fn) { writeHook = fn; }
+
 /** Scoped store for one user's data. */
 export function userStore(username) {
-  const prefix = 'u.' + username.toLowerCase() + '.';
+  const user = username.toLowerCase();
+  const prefix = 'u.' + user + '.';
   return {
     get: (key, fallback = null) => store.get(prefix + key, fallback),
-    set: (key, value) => store.set(prefix + key, value),
+    set: (key, value) => {
+      const ok = store.set(prefix + key, value);
+      if (writeHook) { try { writeHook(user, key, value); } catch { /* sync must not break the UI */ } }
+      return ok;
+    },
     remove: (key) => store.remove(prefix + key)
   };
+}
+
+/** Write a user value WITHOUT triggering the sync hook (used by the sync
+    layer itself when hydrating from the server). */
+export function writeUserValueRaw(username, key, value) {
+  store.set('u.' + username.toLowerCase() + '.' + key, value);
 }
 
 /** All localStorage keys belonging to one user (for export / delete). */

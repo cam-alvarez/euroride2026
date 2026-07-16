@@ -4,6 +4,7 @@
    docs/ACCOUNTS-AND-SYNC.md for the cross-device upgrade path.
    ===================================================================== */
 import { tr, getLang, setLang } from '../i18n.js';
+import { remoteEnabled } from '../config.js';
 import { esc, icons, toast, openModal, closeModal } from '../ui.js';
 import { listProfiles, currentUser, register, login, logout, deleteProfile } from '../auth.js';
 import { store, exportUserData } from '../store.js';
@@ -25,7 +26,7 @@ function renderSignedOut(view) {
   view.innerHTML = `
     <div class="view-head">
       <h1 class="view-title display">${esc(tr('profile.title'))}</h1>
-      <p class="view-sub">${esc(tr('profile.heroSub'))}</p>
+      <p class="view-sub">${esc(tr(remoteEnabled() ? 'profile.heroSubRemote' : 'profile.heroSub'))}</p>
     </div>
 
     <div class="seg auth-tabs">
@@ -231,7 +232,7 @@ function privacyCard() {
   return `
     <h2 class="sec-title display" style="font-size:18px">${esc(tr('profile.privacy'))}</h2>
     <div class="card card-pad">
-      <p class="card-sub">${esc(tr('profile.privacyBody'))}</p>
+      <p class="card-sub">${esc(tr(remoteEnabled() ? 'profile.privacyBodyRemote' : 'profile.privacyBody'))}</p>
       <p class="card-sub" style="margin-top:10px">${esc(tr('profile.aboutBody'))}</p>
     </div>`;
 }

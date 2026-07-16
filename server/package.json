@@ -1,0 +1,17 @@
+{
+  "name": "euroride-api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --local",
+    "deploy": "wrangler deploy",
+    "db:local": "wrangler d1 execute euroride --local --file=schema.sql",
+    "db:remote": "wrangler d1 execute euroride --remote --file=schema.sql"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.61.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

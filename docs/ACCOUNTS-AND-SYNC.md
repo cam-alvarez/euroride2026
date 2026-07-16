@@ -1,5 +1,11 @@
 # Accounts & Sync — Current Model and Upgrade Path
 
+> **STATUS: the upgrade path below is BUILT.** The recommended Cloudflare
+> Workers + D1 design is implemented in `server/` and the app switches to
+> real cross-device accounts when `js/config.js` points at it — see
+> `docs/DEPLOY-SERVER.md`. Without it, the device-local model described
+> here remains the default.
+
 ## What ships today (v3)
 
 **Device-local profiles.** Username + password, no email — exactly as
