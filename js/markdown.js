@@ -11,13 +11,21 @@
    ===================================================================== */
 import { esc } from './ui.js';
 
-export function md(raw) {
+/**
+ * opts.saveLabel — when set, every list item is wrapped in a .li-text
+ * span followed by a small "+" button (aria-label = saveLabel) so the
+ * host view can offer "save this item" (the chat uses it for plans).
+ */
+export function md(raw, opts = {}) {
   const lines = esc(String(raw ?? '')).split(/\r?\n/);
   const out = [];
   let list = null; // 'ul' | 'ol' while inside one
 
   const closeList = () => { if (list) { out.push(`</${list}>`); list = null; } };
   const openList = kind => { if (list !== kind) { closeList(); out.push(`<${kind}>`); list = kind; } };
+  const li = content => opts.saveLabel
+    ? `<li><span class="li-text">${inline(content)}</span><button type="button" class="li-save" aria-label="${esc(opts.saveLabel)}" title="${esc(opts.saveLabel)}">+</button></li>`
+    : `<li>${inline(content)}</li>`;
 
   for (const line of lines) {
     const s = line.trim();
@@ -29,10 +37,10 @@ export function md(raw) {
     if (heading) { closeList(); out.push(`<p class="md-h">${inline(heading[1])}</p>`); continue; }
 
     const bullet = s.match(/^[-*•]\s+(.*)$/);
-    if (bullet) { openList('ul'); out.push(`<li>${inline(bullet[1])}</li>`); continue; }
+    if (bullet) { openList('ul'); out.push(li(bullet[1])); continue; }
 
     const numbered = s.match(/^\d{1,3}[.)]\s+(.*)$/);
-    if (numbered) { openList('ol'); out.push(`<li>${inline(numbered[1])}</li>`); continue; }
+    if (numbered) { openList('ol'); out.push(li(numbered[1])); continue; }
 
     closeList();
     out.push(`<p>${inline(s)}</p>`);

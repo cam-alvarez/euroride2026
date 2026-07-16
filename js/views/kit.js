@@ -13,6 +13,7 @@ import { t, tr } from '../i18n.js';
 import { esc, icons, toast, shareText } from '../ui.js';
 import { currentUser } from '../auth.js';
 import { userStore } from '../store.js';
+import { openPlanEditor, getPlans, setPlans, KINDS, kindLabel } from '../plan-editor.js';
 
 let section = 'packing'; // 'packing' | 'plans'
 const openCats = new Set([PACKING_TEMPLATE[0]?.id]);
@@ -106,6 +107,12 @@ function bindEvents(body, user) {
     if (planDel) {
       setPlans(user, getPlans(user).filter(p => p.id !== planDel));
       renderPlans(body, user);
+      return;
+    }
+    const planEdit = e.target.closest('[data-plan-edit]')?.dataset.planEdit;
+    if (planEdit) {
+      const plan = getPlans(user).find(p => p.id === planEdit);
+      if (plan) openPlanEditor(user, { plan, onSaved: () => renderPlans(body, user) });
       return;
     }
     const sug = e.target.closest('[data-suggest]')?.dataset.suggest;
@@ -241,12 +248,6 @@ function renderPacking(body, user) {
 }
 
 /* ================= PLANS ================= */
-function getPlans(user) { return userStore(user).get('plans', []); }
-function setPlans(user, plans) { userStore(user).set('plans', plans); }
-
-const KINDS = ['do', 'eat', 'see', 'stay'];
-const kindLabel = k => tr('kit.kind' + k[0].toUpperCase() + k.slice(1));
-
 function plansAsText(plans) {
   const lines = [`📌 ${tr('kit.myPlansHeader')}`, ''];
   for (const p of plans) {
@@ -278,7 +279,8 @@ function renderPlans(body, user) {
             ${safeLink ? `<a href="${esc(safeLink)}" target="_blank" rel="noopener">↗ ${esc(tr('kit.linkLabel'))}</a>` : ''}
           </div>
         </div>
-        <button class="cr-del" data-plan-del="${esc(p.id)}" aria-label="${esc(tr('common.delete'))}">✕</button>
+        <button class="cr-edit" data-plan-edit="${esc(p.id)}" aria-label="${esc(tr('kit.editPlan'))}">✎</button>
+        <button class="cr-del" data-plan-del="${esc(p.id)}" aria-label="${esc(tr('common.delete'))}">${icons.trash}</button>
       </div>`;
   };
 
